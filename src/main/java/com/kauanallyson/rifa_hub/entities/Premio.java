@@ -3,7 +3,6 @@ package com.kauanallyson.rifa_hub.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -12,29 +11,32 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "vendedores")
-public class Vendedor {
+@Table(name = "premios")
+public class Premio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String nome;
+    private String descricao;
 
     @Column(nullable = false)
-    private String telefone;
+    private Integer colocacao;
 
-    @Column(unique = true)
-    private String email;
-
-    @OneToMany(mappedBy = "vendedor")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "rifa_id")
     @ToString.Exclude
-    private List<Ponto> pontosVendidos;
+    private Rifa rifa;
+
+    @OneToOne
+    @JoinColumn(name = "ponto_vencedor_id")
+    @ToString.Exclude
+    private Ponto pontoVencedor;
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Vendedor vendedor)) return false;
-        return Objects.equals(id, vendedor.id);
+        if (!(o instanceof Premio premio)) return false;
+        return Objects.equals(id, premio.id);
     }
 
     @Override

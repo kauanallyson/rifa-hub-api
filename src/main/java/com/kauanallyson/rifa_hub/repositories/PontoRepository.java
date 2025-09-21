@@ -2,13 +2,8 @@ package com.kauanallyson.rifa_hub.repositories;
 
 import com.kauanallyson.rifa_hub.entities.Ponto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
+@Repository
 public interface PontoRepository extends JpaRepository<Ponto, Long> {
-    List<Ponto> findByRifaId(Long rifaId);
-
-    List<Ponto> findByVendaId(Long vendaId);
-
-    boolean existsByRifaIdAndNumero(Long rifaId, Integer numero);
 }

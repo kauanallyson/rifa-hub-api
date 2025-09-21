@@ -12,8 +12,8 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "vendedores")
-public class Vendedor {
+@Table(name = "compradores")
+public class Comprador {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,20 +21,20 @@ public class Vendedor {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String telefone;
 
     @Column(unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "vendedor")
+    @OneToMany(mappedBy = "comprador")
     @ToString.Exclude
-    private List<Ponto> pontosVendidos;
+    private List<Ponto> pontosComprados;
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Vendedor vendedor)) return false;
-        return Objects.equals(id, vendedor.id);
+        if (!(o instanceof Comprador comprador)) return false;
+        return Objects.equals(id, comprador.id);
     }
 
     @Override
