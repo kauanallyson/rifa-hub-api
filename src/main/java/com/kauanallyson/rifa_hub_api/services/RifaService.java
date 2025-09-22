@@ -5,6 +5,7 @@ import com.kauanallyson.rifa_hub_api.dto.premio.PremioCreateDTO;
 import com.kauanallyson.rifa_hub_api.dto.premio.PremioResponseDTO;
 import com.kauanallyson.rifa_hub_api.dto.rifa.RifaCreateDTO;
 import com.kauanallyson.rifa_hub_api.dto.rifa.RifaResponseDTO;
+import com.kauanallyson.rifa_hub_api.dto.rifa.RifaUpdateDTO;
 import com.kauanallyson.rifa_hub_api.entities.Ponto;
 import com.kauanallyson.rifa_hub_api.entities.Premio;
 import com.kauanallyson.rifa_hub_api.entities.Rifa;
@@ -88,6 +89,29 @@ public class RifaService {
         Rifa rifa= rifaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rifa com id " + id + " não encontrada"));
         return mapRifaToResponseDTO(rifa);
+    }
+
+    @Transactional
+    public RifaResponseDTO updateRifa(RifaUpdateDTO dto, Long id){
+        Rifa rifa = rifaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Rifa com id " + id + " não encontrada"));
+
+        if (rifa.getStatus() != StatusRifa.ABERTA){
+            throw new BusinessException("Apenas rifas com status 'ABERTA' podem ser editadas");
+        }
+
+        Optional<Rifa> rifaComMesmoNome = rifaRepository.findByNome(dto.nome());
+        if (rifaComMesmoNome.isPresent() && !rifaComMesmoNome.get().getId().equals(id)){
+            throw new DuplicateResourceException("Já existe outra rifa cadastrada com o nome: " + dto.nome());
+        }
+
+        rifa.setNome(dto.nome());
+        rifa.setDescricao(dto.descricao());
+        rifa.setPontoPreco(dto.pontoPreco());
+        rifa.setDataSorteio(dto.dataSorteio());
+
+        Rifa rifaAtualizada = rifaRepository.save(rifa);
+        return mapRifaToResponseDTO(rifaAtualizada);
     }
 
     // Other methods

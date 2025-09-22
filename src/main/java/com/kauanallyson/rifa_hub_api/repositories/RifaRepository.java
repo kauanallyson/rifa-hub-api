@@ -4,7 +4,10 @@ import com.kauanallyson.rifa_hub_api.entities.Rifa;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface RifaRepository extends JpaRepository<Rifa, Long> {
-    public boolean existsByNome(String nome);
+    boolean existsByNome(String nome);
+    Optional<Rifa> findByNome(String nome);
 }

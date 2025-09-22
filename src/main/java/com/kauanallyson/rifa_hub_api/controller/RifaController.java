@@ -2,6 +2,7 @@ package com.kauanallyson.rifa_hub_api.controller;
 
 import com.kauanallyson.rifa_hub_api.dto.rifa.RifaCreateDTO;
 import com.kauanallyson.rifa_hub_api.dto.rifa.RifaResponseDTO;
+import com.kauanallyson.rifa_hub_api.dto.rifa.RifaUpdateDTO;
 import com.kauanallyson.rifa_hub_api.services.RifaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,12 @@ public class RifaController {
     @GetMapping("{id}")
     public ResponseEntity<RifaResponseDTO> findRifaById(@PathVariable Long id){
         RifaResponseDTO rifa = rifaService.findRifaById(id);
+        return ResponseEntity.ok(rifa);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<RifaResponseDTO> updateRifa(RifaUpdateDTO dto, @PathVariable Long id){
+        RifaResponseDTO rifa = rifaService.updateRifa(dto, id);
         return ResponseEntity.ok(rifa);
     }
 }
