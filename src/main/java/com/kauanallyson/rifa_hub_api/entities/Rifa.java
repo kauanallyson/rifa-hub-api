@@ -34,10 +34,10 @@ public class Rifa {
     @Column(nullable = false)
     private BigDecimal pontoPreco;
 
+    private LocalDateTime dataSorteio;
+
     @Column(nullable = false)
     private Integer quantidadePontos;
-
-    private LocalDateTime dataSorteio;
 
     @OneToMany(mappedBy = "rifa", cascade = CascadeType.ALL)
     @ToString.Exclude

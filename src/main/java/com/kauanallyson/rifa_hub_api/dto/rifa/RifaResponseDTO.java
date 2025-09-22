@@ -13,8 +13,8 @@ public record RifaResponseDTO(
     String descricao,
     List<PremioResponseDTO> premios,
     BigDecimal pontoPreco,
-    Integer quantidadePontos,
     LocalDateTime dataSorteio,
+    Integer quantidadePontos,
     Long pontosVendidos,
     Long pontosDisponiveis,
     StatusRifa status
