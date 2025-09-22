@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RifaRepository extends JpaRepository<Rifa, Long> {
+    public boolean existsByNome(String nome);
 }

@@ -10,13 +10,17 @@ import com.kauanallyson.rifa_hub_api.entities.Premio;
 import com.kauanallyson.rifa_hub_api.entities.Rifa;
 import com.kauanallyson.rifa_hub_api.entities.enums.StatusPonto;
 import com.kauanallyson.rifa_hub_api.entities.enums.StatusRifa;
+import com.kauanallyson.rifa_hub_api.exceptions.BusinessException;
+import com.kauanallyson.rifa_hub_api.exceptions.DuplicateResourceException;
 import com.kauanallyson.rifa_hub_api.repositories.RifaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -24,10 +28,22 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class RifaService {
     @Autowired
-    RifaRepository repository;
+    RifaRepository rifaRepository;
 
     @Transactional
     public RifaResponseDTO createRifa(RifaCreateDTO dto){
+        if (rifaRepository.existsByNome(dto.nome())) {
+            throw new DuplicateResourceException("Já existe uma rifa cadastrada com o nome: " + dto.nome());
+        }
+        List<Integer> colocacoes = dto.premios().stream()
+                .map(PremioCreateDTO::colocacao)
+                .toList();
+        Set<Integer> colocacoesUnicas = new HashSet<>(colocacoes);
+
+        if (colocacoes.size() != colocacoesUnicas.size()) {
+            throw new BusinessException("Não é permitido cadastrar prêmios com a mesma colocação.");
+        }
+
         Rifa rifa = new Rifa();
         rifa.setNome(dto.nome());
         rifa.setDescricao(dto.descricao());
@@ -51,7 +67,7 @@ public class RifaService {
                 })
                 .toList();
         rifa.setPontos(pontos);
-        Rifa rifaSalva = repository.saveAndFlush(rifa);
+        Rifa rifaSalva = rifaRepository.saveAndFlush(rifa);
         return mapRifaToResponseDTO(rifaSalva);
     }
 
