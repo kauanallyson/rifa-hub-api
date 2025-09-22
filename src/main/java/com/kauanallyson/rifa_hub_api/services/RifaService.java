@@ -114,6 +114,28 @@ public class RifaService {
         return mapRifaToResponseDTO(rifaAtualizada);
     }
 
+    @Transactional
+    public void cancelRifa(Long id){
+        Rifa rifa = rifaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Rifa com id " + id + " não encontrada"));
+
+        if (rifa.getStatus() == StatusRifa.FINALIZADA){
+            throw new BusinessException("Rifas com status 'FINALIZADAS' não podem ser canceladas");
+        }
+        if (rifa.getStatus() == StatusRifa.CANCELADA) {
+            throw new BusinessException("Esta rifa já está cancelada.");
+        }
+
+        boolean temPontosVendidos = rifa.getPontos().stream()
+                .anyMatch(ponto -> ponto.getStatus() != StatusPonto.DISPONIVEL);
+        if (temPontosVendidos) {
+            throw new BusinessException("Não é possível cancelar uma rifa que já possui pontos vendidos ou reservados.");
+        }
+
+        rifa.setStatus(StatusRifa.CANCELADA);
+        rifaRepository.save(rifa);
+    }
+
     // Other methods
     private Premio mapPremioDtoToEntity(PremioCreateDTO dto, Rifa rifa){
         Premio premio = new Premio();

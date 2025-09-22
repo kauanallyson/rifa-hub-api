@@ -28,15 +28,20 @@ public class RifaController {
         return ResponseEntity.ok(rifaService.getAllRifas(pageable));
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<RifaResponseDTO> findRifaById(@PathVariable Long id){
         RifaResponseDTO rifa = rifaService.findRifaById(id);
         return ResponseEntity.ok(rifa);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<RifaResponseDTO> updateRifa(RifaUpdateDTO dto, @PathVariable Long id){
         RifaResponseDTO rifa = rifaService.updateRifa(dto, id);
         return ResponseEntity.ok(rifa);
+    }
+
+    @DeleteMapping("/{id}")
+    public void cancelRifa(@PathVariable Long id){
+        rifaService.cancelRifa(id);
     }
 }
