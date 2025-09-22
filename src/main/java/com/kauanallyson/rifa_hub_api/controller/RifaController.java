@@ -43,6 +43,6 @@ public class RifaController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelRifa(@PathVariable Long id){
-        rifaService.cancelRifa(id);
+        rifaService.deleteRifa(id);
     }
 }

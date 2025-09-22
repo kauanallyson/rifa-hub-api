@@ -15,6 +15,8 @@ import com.kauanallyson.rifa_hub_api.exceptions.BusinessException;
 import com.kauanallyson.rifa_hub_api.exceptions.DuplicateResourceException;
 import com.kauanallyson.rifa_hub_api.exceptions.ResourceNotFoundException;
 import com.kauanallyson.rifa_hub_api.repositories.RifaRepository;
+import com.kauanallyson.rifa_hub_api.utils.mappers.PremioMapper;
+import com.kauanallyson.rifa_hub_api.utils.mappers.RifaMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,8 +34,9 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 public class RifaService {
-    @Autowired
-    RifaRepository rifaRepository;
+    private final RifaRepository rifaRepository;
+    private final RifaMapper rifaMapper;
+    private final PremioMapper premioMapper;
     // Create
     @Transactional
     public RifaResponseDTO createRifa(RifaCreateDTO dto){
@@ -58,7 +61,7 @@ public class RifaService {
         rifa.setStatus(StatusRifa.ABERTA);
 
         List<Premio> premios = dto.premios().stream()
-                .map(premioDTO -> mapPremioDtoToEntity(premioDTO, rifa))
+                .map(premioDTO -> premioMapper.toEntity(premioDTO, rifa))
                 .collect(Collectors.toList());
         rifa.setPremios(premios);
 
@@ -72,25 +75,26 @@ public class RifaService {
                 })
                 .toList();
         rifa.setPontos(pontos);
-        Rifa rifaSalva = rifaRepository.saveAndFlush(rifa);
-        return mapRifaToResponseDTO(rifaSalva);
+        Rifa rifaSalva = rifaRepository.save(rifa);
+        return rifaMapper.toResponseDTO(rifaSalva);
     }
 
     // Get all
     @Transactional(readOnly = true)
     public Page<RifaResponseDTO> getAllRifas(Pageable pageable){
         Page<Rifa> rifasPaginadas = rifaRepository.findAll(pageable);
-        return rifasPaginadas.map(this::mapRifaToResponseDTO);
+        return rifasPaginadas.map(rifaMapper::toResponseDTO);
     }
 
     // Find by id
-    @Transactional
+    @Transactional(readOnly = true)
     public RifaResponseDTO findRifaById(Long id){
         Rifa rifa= rifaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rifa com id " + id + " não encontrada"));
-        return mapRifaToResponseDTO(rifa);
+        return rifaMapper.toResponseDTO(rifa);
     }
 
+    // Update
     @Transactional
     public RifaResponseDTO updateRifa(RifaUpdateDTO dto, Long id){
         Rifa rifa = rifaRepository.findById(id)
@@ -111,11 +115,12 @@ public class RifaService {
         rifa.setDataSorteio(dto.dataSorteio());
 
         Rifa rifaAtualizada = rifaRepository.save(rifa);
-        return mapRifaToResponseDTO(rifaAtualizada);
+        return rifaMapper.toResponseDTO(rifaAtualizada);
     }
 
+    // Delete
     @Transactional
-    public void cancelRifa(Long id){
+    public void deleteRifa(Long id){
         Rifa rifa = rifaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rifa com id " + id + " não encontrada"));
 
@@ -134,55 +139,5 @@ public class RifaService {
 
         rifa.setStatus(StatusRifa.CANCELADA);
         rifaRepository.save(rifa);
-    }
-
-    // Other methods
-    private Premio mapPremioDtoToEntity(PremioCreateDTO dto, Rifa rifa){
-        Premio premio = new Premio();
-        premio.setDescricao(dto.descricao());
-        premio.setColocacao(dto.colocacao());
-        premio.setRifa(rifa);
-        return premio;
-    }
-
-    private RifaResponseDTO mapRifaToResponseDTO(Rifa rifa) {
-        Long pontosVendidos = rifa.getPontos().stream()
-                .filter(p -> p.getStatus() == StatusPonto.VENDIDO)
-                .count();
-        Long pontosDisponiveis = rifa.getQuantidadePontos() - pontosVendidos;
-        List<PremioResponseDTO> premiosDTO = rifa.getPremios().stream()
-                .map(this::mapPremioToResponseDTO)
-                .toList();
-        return new RifaResponseDTO(
-                rifa.getId(),
-                rifa.getNome(),
-                rifa.getDescricao(),
-                premiosDTO,
-                rifa.getPontoPreco(),
-                rifa.getDataSorteio(),
-                rifa.getQuantidadePontos(),
-                pontosVendidos,
-                pontosDisponiveis,
-                rifa.getStatus()
-        );
-    }
-
-    private PremioResponseDTO mapPremioToResponseDTO(Premio premio) {
-        return new PremioResponseDTO(
-                premio.getDescricao(),
-                premio.getColocacao(),
-                premio.getPontoVencedor() != null ? mapPontoToResponseDTO(premio.getPontoVencedor()) : null
-        );
-    }
-
-    private PontoResponseDTO mapPontoToResponseDTO(Ponto ponto) {
-        String nomeComprador = ponto.getComprador() != null ? ponto.getComprador().getNome() : null;
-        String nomeVendedor = ponto.getVendedor() != null ? ponto.getVendedor().getNome() : null;
-        return new PontoResponseDTO(
-                ponto.getNumero(),
-                ponto.getStatus(),
-                nomeComprador,
-                nomeVendedor
-        );
     }
 }
