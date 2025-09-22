@@ -33,7 +33,7 @@ import java.util.stream.IntStream;
 public class RifaService {
     @Autowired
     RifaRepository rifaRepository;
-
+    // Create
     @Transactional
     public RifaResponseDTO createRifa(RifaCreateDTO dto){
         if (rifaRepository.existsByNome(dto.nome())) {
@@ -75,12 +75,14 @@ public class RifaService {
         return mapRifaToResponseDTO(rifaSalva);
     }
 
+    // Get all
     @Transactional(readOnly = true)
     public Page<RifaResponseDTO> getAllRifas(Pageable pageable){
         Page<Rifa> rifasPaginadas = rifaRepository.findAll(pageable);
         return rifasPaginadas.map(this::mapRifaToResponseDTO);
     }
 
+    // Find by id
     @Transactional
     public RifaResponseDTO findRifaById(Long id){
         Rifa rifa= rifaRepository.findById(id)
@@ -88,6 +90,7 @@ public class RifaService {
         return mapRifaToResponseDTO(rifa);
     }
 
+    // Other methods
     private Premio mapPremioDtoToEntity(PremioCreateDTO dto, Rifa rifa){
         Premio premio = new Premio();
         premio.setDescricao(dto.descricao());
