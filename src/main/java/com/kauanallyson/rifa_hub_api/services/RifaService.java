@@ -12,14 +12,18 @@ import com.kauanallyson.rifa_hub_api.entities.enums.StatusPonto;
 import com.kauanallyson.rifa_hub_api.entities.enums.StatusRifa;
 import com.kauanallyson.rifa_hub_api.exceptions.BusinessException;
 import com.kauanallyson.rifa_hub_api.exceptions.DuplicateResourceException;
+import com.kauanallyson.rifa_hub_api.exceptions.ResourceNotFoundException;
 import com.kauanallyson.rifa_hub_api.repositories.RifaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -69,6 +73,19 @@ public class RifaService {
         rifa.setPontos(pontos);
         Rifa rifaSalva = rifaRepository.saveAndFlush(rifa);
         return mapRifaToResponseDTO(rifaSalva);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RifaResponseDTO> getAllRifas(Pageable pageable){
+        Page<Rifa> rifasPaginadas = rifaRepository.findAll(pageable);
+        return rifasPaginadas.map(this::mapRifaToResponseDTO);
+    }
+
+    @Transactional
+    public RifaResponseDTO findRifaById(Long id){
+        Rifa rifa= rifaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Rifa com id " + id + " não encontrada"));
+        return mapRifaToResponseDTO(rifa);
     }
 
     private Premio mapPremioDtoToEntity(PremioCreateDTO dto, Rifa rifa){
