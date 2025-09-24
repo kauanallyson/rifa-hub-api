@@ -1,6 +1,6 @@
 package com.kauanallyson.rifa_hub_api.utils.mappers;
 
-import com.kauanallyson.rifa_hub_api.dto.ponto.PontoResponseDTO;
+import com.kauanallyson.rifa_hub_api.dtos.ponto.PontoResponseDTO;
 import com.kauanallyson.rifa_hub_api.entities.Ponto;
 import org.springframework.stereotype.Component;
 

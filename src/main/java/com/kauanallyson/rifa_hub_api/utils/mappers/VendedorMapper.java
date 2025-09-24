@@ -1,8 +1,9 @@
 package com.kauanallyson.rifa_hub_api.utils.mappers;
 
-import com.kauanallyson.rifa_hub_api.dto.ponto.PontoResponseDTO;
-import com.kauanallyson.rifa_hub_api.dto.vendedor.VendedorCreateDTO;
-import com.kauanallyson.rifa_hub_api.dto.vendedor.VendedorResponseDTO;
+import com.kauanallyson.rifa_hub_api.dtos.ponto.PontoResponseDTO;
+import com.kauanallyson.rifa_hub_api.dtos.vendedor.VendedorCreateDTO;
+import com.kauanallyson.rifa_hub_api.dtos.vendedor.VendedorResponseDTO;
+import com.kauanallyson.rifa_hub_api.dtos.vendedor.VendedorUpdateDTO;
 import com.kauanallyson.rifa_hub_api.entities.Vendedor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,14 @@ import java.util.stream.Collectors;
 public class VendedorMapper {
 
     private final PontoMapper pontoMapper;
+
+    public Vendedor toEntity(VendedorCreateDTO dto) {
+        Vendedor vendedor = new Vendedor();
+        vendedor.setNome(dto.nome());
+        vendedor.setTelefone(dto.telefone());
+        vendedor.setEmail(dto.email());
+        return vendedor;
+    }
 
     public VendedorResponseDTO toResponseDTO(Vendedor vendedor) {
         List<PontoResponseDTO> pontosDto = vendedor.getPontosVendidos() != null ?
@@ -33,11 +42,9 @@ public class VendedorMapper {
         );
     }
 
-    public Vendedor toEntity(VendedorCreateDTO dto) {
-        Vendedor vendedor = new Vendedor();
+    public void updateEntityFromDTO(VendedorUpdateDTO dto, Vendedor vendedor) {
         vendedor.setNome(dto.nome());
         vendedor.setTelefone(dto.telefone());
         vendedor.setEmail(dto.email());
-        return vendedor;
     }
 }

@@ -1,6 +1,6 @@
-package com.kauanallyson.rifa_hub_api.dto.rifa;
+package com.kauanallyson.rifa_hub_api.dtos.rifa;
 
-import com.kauanallyson.rifa_hub_api.dto.ponto.PontoResponseDTO;
+import com.kauanallyson.rifa_hub_api.dtos.ponto.PontoResponseDTO;
 import com.kauanallyson.rifa_hub_api.entities.enums.StatusRifa;
 
 import java.util.List;
@@ -11,4 +11,5 @@ public record RifaDetailResponseDTO(
         String premio,
         StatusRifa status,
         List<PontoResponseDTO> pontos
-) {}
+) {
+}
