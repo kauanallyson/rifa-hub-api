@@ -21,7 +21,7 @@ public class Vendedor {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String telefone;
 
     @Column(unique = true)
@@ -30,6 +30,8 @@ public class Vendedor {
     @OneToMany(mappedBy = "vendedor")
     @ToString.Exclude
     private List<Ponto> pontosVendidos;
+
+    private boolean ativo = true;
 
     @Override
     public boolean equals(Object o) {

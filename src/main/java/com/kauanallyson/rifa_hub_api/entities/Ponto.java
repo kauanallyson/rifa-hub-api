@@ -14,9 +14,9 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "pontos",
-    uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"numero", "rifa_id"})
-    })
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"numero", "rifa_id"})
+        })
 public class Ponto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

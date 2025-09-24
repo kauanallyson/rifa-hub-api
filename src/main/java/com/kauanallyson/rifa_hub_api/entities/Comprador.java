@@ -31,6 +31,8 @@ public class Comprador {
     @ToString.Exclude
     private List<Ponto> pontosComprados;
 
+    private boolean ativo = true;
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Comprador comprador)) return false;
