@@ -17,8 +17,6 @@ public interface RifaRepository extends JpaRepository<Rifa, Long>, JpaSpecificat
 
     Optional<Rifa> findByNome(String nome);
 
-    Page<Rifa> findAllByNome(String nome);
-
     Page<Rifa> findAllByNomeContainingIgnoreCaseAndStatusIn(String nome, Collection<StatusRifa> statuses, Pageable pageable);
 
     Page<Rifa> findAllByStatus(StatusRifa status, Pageable pageable);
