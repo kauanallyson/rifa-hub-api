@@ -1,6 +1,6 @@
-# Rifa Hub - API
+# Rifa-Hub—API
 
-API RESTful desenvolvida para o sistema de gestão de rifas "Rifa Hub". Esta API é responsável por toda a lógica de negócio, incluindo a criação de rifas, venda de pontos (bilhetes), gestão de vendedores e compradores, e a realização dos sorteios.
+API RESTful desenvolvida para o sistema de gestão de rifas "Rifa-Hub". Esta API é responsável por toda a lógica de negócio, incluindo a criação de rifas, venda de pontos (bilhetes), gestão de vendedores e compradores, e a realização dos sorteios.
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -26,8 +26,8 @@ Antes de começar, você precisará ter as seguintes ferramentas instaladas na s
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/kauanallyson/rifa-hub-api.git
-cd rifa-hub-api
+    git clone https://github.com/kauanallyson/rifa-hub-api.git
+    cd rifa-hub-api
 ```
 
 ### 2. Configure o Banco de Dados
@@ -51,7 +51,7 @@ spring.jpa.show-sql=true
 Use o Maven para compilar e iniciar o servidor Spring Boot:
 
 ```bash
-mvn spring-boot:run
+    mvn spring-boot:run
 ```
 
 A API estará disponível em `http://localhost:8080`.
@@ -139,3 +139,7 @@ Recurso para o gerenciamento de compradores.
 - **`DELETE /api/compradores/{id}`**: Inativa um comprador (soft delete)
 
 ---
+
+## 📝 Licença
+
+Este projeto é licenciado sob os termos da licença MIT. Consulte o arquivo LICENSE na raiz do repositório para mais detalhes.
