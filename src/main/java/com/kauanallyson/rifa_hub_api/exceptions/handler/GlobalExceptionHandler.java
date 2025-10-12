@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 status.value(),
                 "Validation Error",
-                "Um ou mais campos são inválidos. Verifique os detalhes.",
+                "One or more field are invalid. Check details",
                 request.getRequestURI(),
                 fieldErrors
         );
@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 status.value(),
                 "Internal Server Error",
-                "Ocorreu um erro inesperado no servidor. Por favor, contate o suporte.", // Mensagem genérica
+                "There was an unexpected error in the server. Please, contact the support",
                 request.getRequestURI()
         );
         ex.printStackTrace();
