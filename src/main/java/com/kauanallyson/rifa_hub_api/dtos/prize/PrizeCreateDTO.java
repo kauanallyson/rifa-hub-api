@@ -8,8 +8,8 @@ public record PrizeCreateDTO(
         @NotBlank(message = "Description is required")
         String description,
 
-        @NotNull(message = "Prize placing is required")
+        @NotNull(message = "Prize placement is required")
         @Positive(message = "Placing must be a positive number")
-        Integer placing
+        Integer placement
 ) {
 }

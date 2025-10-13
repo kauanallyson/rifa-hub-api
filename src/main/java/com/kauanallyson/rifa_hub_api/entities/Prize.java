@@ -21,10 +21,10 @@ public class Prize {
     private String description;
 
     @Column(nullable = false)
-    private Integer placing;
+    private Integer placement;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "rifa_id")
+    @JoinColumn(name = "raffle_id")
     @ToString.Exclude
     private Raffle raffle;
 

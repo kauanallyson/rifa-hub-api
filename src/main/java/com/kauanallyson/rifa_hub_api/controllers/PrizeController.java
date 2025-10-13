@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/raffles/{id}/prizes")
+@RequestMapping("/api/raffles/{raffleId}/prizes")
 @RequiredArgsConstructor
 public class PrizeController {
 

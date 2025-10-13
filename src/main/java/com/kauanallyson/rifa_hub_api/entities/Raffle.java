@@ -27,7 +27,7 @@ public class Raffle {
     private String description;
 
     @OneToMany(mappedBy = "raffle", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("placing ASC")
+    @OrderBy("placement ASC")
     @ToString.Exclude
     private List<Prize> prizes;
 

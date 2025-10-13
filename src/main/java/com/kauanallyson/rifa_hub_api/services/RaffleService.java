@@ -34,9 +34,9 @@ public class RaffleService {
         if (raffleRepository.existsByName(dto.name())) {
             throw new DuplicateResourceException("Name already taken");
         }
-        List<Integer> placings = dto.prizes().stream().map(PrizeCreateDTO::placing).toList();
+        List<Integer> placings = dto.prizes().stream().map(PrizeCreateDTO::placement).toList();
         if (new HashSet<>(placings).size() < placings.size()) {
-            throw new BusinessException("Only one prize per placing");
+            throw new BusinessException("Only one prize per placement");
         }
         Raffle raffle = raffleMapper.toEntity(dto);
 

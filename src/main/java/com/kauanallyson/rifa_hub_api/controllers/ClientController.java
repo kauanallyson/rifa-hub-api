@@ -21,7 +21,8 @@ public class ClientController {
 
     // POST /api/clients
     @PostMapping
-    public ResponseEntity<ClientResponseDTO> createClient(@Valid @RequestBody ClientCreateDTO dto) {
+    public ResponseEntity<ClientResponseDTO> createClient(
+            @Valid @RequestBody ClientCreateDTO dto) {
         ClientResponseDTO response = clientService.createClient(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

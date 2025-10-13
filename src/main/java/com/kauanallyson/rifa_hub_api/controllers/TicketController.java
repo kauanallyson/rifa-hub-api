@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/raffles/{id}/tickets")
+@RequestMapping("/api/raffles/{raffleId}/tickets")
 @RequiredArgsConstructor
 public class TicketController {
 
@@ -27,8 +27,8 @@ public class TicketController {
     // POST /api/raffles/{raffleId}/tickets/sell
     @PostMapping("/sell")
     public ResponseEntity<List<TicketResponseDTO>> sellTickets(
-            @PathVariable Long rifaId,
+            @PathVariable Long raffleId,
             @Valid @RequestBody TicketOrderRequestDTO dto) {
-        return ResponseEntity.ok(ticketService.sellTickets(rifaId, dto));
+        return ResponseEntity.ok(ticketService.sellTickets(raffleId, dto));
     }
 }

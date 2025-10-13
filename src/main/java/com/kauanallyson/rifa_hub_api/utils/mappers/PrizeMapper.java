@@ -16,7 +16,7 @@ public class PrizeMapper {
     public Prize toEntity(PrizeCreateDTO dto, Raffle raffle) {
         Prize prize = new Prize();
         prize.setDescription(dto.description());
-        prize.setPlacing(dto.placing());
+        prize.setPlacement(dto.placement());
         prize.setRaffle(raffle);
         return prize;
     }
@@ -24,7 +24,7 @@ public class PrizeMapper {
     public PrizeResponseDTO toResponseDTO(Prize prize) {
         return new PrizeResponseDTO(
                 prize.getDescription(),
-                prize.getPlacing(),
+                prize.getPlacement(),
                 ticketMapper.toResponseDTO(prize.getWinningTicket())
         );
     }

@@ -32,9 +32,9 @@ public class PrizeService {
         }
 
         boolean placingAlreadyExists = raffle.getPrizes().stream()
-                .anyMatch(p -> p.getPlacing().equals(dto.placing()));
+                .anyMatch(p -> p.getPlacement().equals(dto.placement()));
         if (placingAlreadyExists) {
-            throw new BusinessException(dto.placing() + "° place already occupied");
+            throw new BusinessException(dto.placement() + "° place already occupied");
         }
 
         Prize newPrize = prizeMapper.toEntity(dto, raffle);

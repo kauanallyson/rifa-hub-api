@@ -41,14 +41,14 @@ public class RaffleController {
         return ResponseEntity.ok(raffleService.findRaffleById(id));
     }
 
-    // GET /api/rifas/search?status=
+    // GET /api/rifas/by-status?status=
     @GetMapping("/by-status")
     public ResponseEntity<List<RaffleResponseDTO>> getRafflesByStatus(
             @RequestParam RaffleStatus status) {
         return ResponseEntity.ok(raffleService.getAllRaffleByStatus(status));
     }
 
-    // GET /api/rifas/search?name=
+    // GET /api/rifas/by-name?name=
     @GetMapping("/by-name")
     public ResponseEntity<List<RaffleResponseDTO>> findRaffleByName(
             @RequestParam String name) {
@@ -73,7 +73,7 @@ public class RaffleController {
 
     // POST /api/raffles/{raffleId}/draw
     @PostMapping("/{id}/draw")
-    public ResponseEntity<RaffleResponseDTO> realizarSorteio(@PathVariable Long id) {
+    public ResponseEntity<RaffleResponseDTO> drawWinningTickets(@PathVariable Long id) {
         return ResponseEntity.ok(raffleService.drawWinningTickets(id));
     }
 }
