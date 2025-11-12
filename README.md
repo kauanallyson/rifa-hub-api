@@ -1,5 +1,4 @@
-# Rifa-Hub—API
-
+# Rifa-Hub
 API RESTful desenvolvida para o sistema de gestão de rifas "Rifa-Hub". Esta API é responsável por toda a lógica de negócio, incluindo a criação de rifas, venda de tickets (bilhetes), gestão de vendedores e compradores, e a realização dos sorteios.
 
 ## 🚀 Tecnologias Utilizadas
