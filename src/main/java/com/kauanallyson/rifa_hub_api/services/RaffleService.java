@@ -1,14 +1,14 @@
 package com.kauanallyson.rifa_hub_api.services;
 
-import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeCreateDTO;
-import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleCreateDTO;
-import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleResponseDTO;
-import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleUpdateDTO;
+import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeCreate;
+import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleCreate;
+import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleResponse;
+import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleUpdate;
 import com.kauanallyson.rifa_hub_api.entities.Prize;
-import com.kauanallyson.rifa_hub_api.entities.Ticket;
 import com.kauanallyson.rifa_hub_api.entities.Raffle;
-import com.kauanallyson.rifa_hub_api.entities.enums.TicketStatus;
-import com.kauanallyson.rifa_hub_api.entities.enums.RaffleStatus;
+import com.kauanallyson.rifa_hub_api.entities.Ticket;
+import com.kauanallyson.rifa_hub_api.enums.RaffleStatus;
+import com.kauanallyson.rifa_hub_api.enums.TicketStatus;
 import com.kauanallyson.rifa_hub_api.exceptions.BusinessException;
 import com.kauanallyson.rifa_hub_api.exceptions.DuplicateResourceException;
 import com.kauanallyson.rifa_hub_api.exceptions.ResourceNotFoundException;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,81 +30,48 @@ public class RaffleService {
 
     // Create
     @Transactional
-    public RaffleResponseDTO createRaffle(RaffleCreateDTO dto) {
-        if (raffleRepository.existsByName(dto.name())) {
-            throw new DuplicateResourceException("Name already taken");
-        }
-        List<Integer> placings = dto.prizes().stream().map(PrizeCreateDTO::placement).toList();
-        if (new HashSet<>(placings).size() < placings.size()) {
-            throw new BusinessException("Only one prize per placement");
-        }
+    public RaffleResponse createRaffle(RaffleCreate dto) {
+        validateNameUniqueness(dto.name(), null);
+        validatePrizePlacements(dto.prizes());
+
         Raffle raffle = raffleMapper.toEntity(dto);
 
-        List<Ticket> tickets = IntStream.rangeClosed(1, dto.ticketAmount())
-            .mapToObj(numero -> {
-            Ticket ticket = new Ticket();
-            ticket.setNumber(numero);
-            ticket.setStatus(TicketStatus.AVAILABLE);
-            ticket.setRaffle(raffle);
-            return ticket;
-            })
-            .toList();
+        List<Ticket> tickets = generateTickets(dto.ticketAmount(), raffle);
         raffle.setTickets(tickets);
+
         Raffle savedRaffle = raffleRepository.save(raffle);
         return raffleMapper.toResponseDTO(savedRaffle);
     }
 
-    // Get all Active
+    // Find All
     @Transactional(readOnly = true)
-    public List<RaffleResponseDTO> getAllActiveRaffles() {
-        List<Raffle> raffles = raffleRepository.findAllByStatus(RaffleStatus.OPEN);
+    public List<RaffleResponse> findAll(String name, RaffleStatus status) {
+        String filterName = (name != null && !name.isBlank()) ? name : null;
+
+        List<Raffle> raffles = raffleRepository.findWithFilters(filterName, status);
+
         return raffles.stream()
                 .map(raffleMapper::toResponseDTO)
                 .toList();
     }
 
-    // Get all by Status
+    // Find By Id
     @Transactional(readOnly = true)
-    public List<RaffleResponseDTO> getAllRaffleByStatus(RaffleStatus status) {
-        List<Raffle> raffles = raffleRepository.findAllByStatus(status);
-        return raffles.stream()
-                .map(raffleMapper::toResponseDTO)
-                .toList();
-    }
-
-    // Find by Name
-    @Transactional(readOnly = true)
-    public List<RaffleResponseDTO> findRaffleByName(String name) {
-        List<RaffleStatus> desiredStatus = new ArrayList<>();
-        desiredStatus.add(RaffleStatus.OPEN);
-        List<Raffle> raffles = raffleRepository.findAllByNameAndStatusIn(name, desiredStatus);
-        return raffles.stream()
-                .map(raffleMapper::toResponseDTO)
-                .toList();
-    }
-
-    // Find by id
-    @Transactional(readOnly = true)
-    public RaffleResponseDTO findRaffleById(Long id) {
-        Raffle raffle = raffleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Raffle with id " + id + " not found"));
+    public RaffleResponse findRaffleById(Long id) {
+        Raffle raffle = getRaffleOrThrow(id);
         return raffleMapper.toResponseDTO(raffle);
     }
 
     // Update
     @Transactional
-    public RaffleResponseDTO updateRaffle(RaffleUpdateDTO dto, Long id) {
-        Raffle raffle = raffleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Raffle with id " + id + " not found"));
+    public RaffleResponse updateRaffle(RaffleUpdate dto, Long id) {
+        Raffle raffle = getRaffleOrThrow(id);
 
         if (raffle.getStatus() != RaffleStatus.OPEN) {
             throw new BusinessException("Only Raffles with status 'OPEN' can be updated");
         }
 
-        Optional<Raffle> raffleWithSameName = raffleRepository.findByName(dto.name());
-        if (raffleWithSameName.isPresent() && !raffleWithSameName.get().getId().equals(id)) {
-            throw new DuplicateResourceException("Name already taken");
-        }
+        validateNameUniqueness(dto.name(), id);
 
         raffleMapper.updateEntityFromDTO(dto, raffle);
         raffleRepository.save(raffle);
@@ -114,63 +81,100 @@ public class RaffleService {
     // Delete
     @Transactional
     public void deleteRaffle(Long id) {
-        Raffle raffle = raffleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Raffle with id " + id + " not found"));
+        Raffle raffle = getRaffleOrThrow(id);
 
         if (raffle.getStatus() == RaffleStatus.FINISHED) {
-            throw new BusinessException("Only Raffles with status 'FINISHED' can be updated");
+            throw new BusinessException("Cannot cancel a finished raffle");
         }
         if (raffle.getStatus() == RaffleStatus.CANCELED) {
             throw new BusinessException("Raffle already canceled");
         }
-        boolean hasSoldTickets = raffle.getTickets()
-                .stream()
-                .anyMatch(ponto -> ponto.getStatus() != TicketStatus.AVAILABLE);
+
+        boolean hasSoldTickets = raffle.getTickets().stream()
+                .anyMatch(ticket -> ticket.getStatus() != TicketStatus.AVAILABLE);
+
         if (hasSoldTickets) {
-            throw new BusinessException("Cannot cancel a raffle that has sold points");
+            throw new BusinessException("Cannot cancel a raffle that has sold tickets");
         }
 
         raffle.setStatus(RaffleStatus.CANCELED);
         raffleRepository.save(raffle);
     }
 
+    // Draw
     @Transactional
-    public RaffleResponseDTO drawWinningTickets(Long id) {
-        Raffle raffle = raffleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Raffle with id " + id + " not found"));
+    public RaffleResponse drawWinningTickets(Long id) {
+        Raffle raffle = getRaffleOrThrow(id);
 
-        if (raffle.getStatus() != RaffleStatus.OPEN) {
-            throw new BusinessException("Only Raffles with status 'OPEN' can be drawn");
-        }
+        validateDrawPrerequisites(raffle);
 
-        if (raffle.getDrawDate() != null && LocalDateTime.now().isBefore(raffle.getDrawDate())) {
-            throw new BusinessException("Draw date has not been reached yet");
-        }
-
-        List<Ticket> ticketsSold = new java.util.ArrayList<>(raffle.getTickets().stream()
-                .filter(ponto -> ponto.getStatus() == TicketStatus.SOLD)
+        List<Ticket> ticketsSold = new ArrayList<>(raffle.getTickets().stream()
+                .filter(t -> t.getStatus() == TicketStatus.SOLD)
                 .toList());
 
-        if (ticketsSold.isEmpty()) {
-            throw new BusinessException("No tickets sold. Cannot perform draw");
-        }
-
-        int numberOfPrizes = raffle.getPrizes().size();
-        if (ticketsSold.size() < numberOfPrizes) {
+        if (ticketsSold.size() < raffle.getPrizes().size()) {
             throw new BusinessException("Not enough tickets sold. Cannot perform draw");
         }
 
         Collections.shuffle(ticketsSold);
-        List<Ticket> drawnTickets = ticketsSold.subList(0, numberOfPrizes);
 
+        int numberOfPrizes = raffle.getPrizes().size();
         for (int i = 0; i < numberOfPrizes; i++) {
             Prize prize = raffle.getPrizes().get(i);
-            Ticket winningTicket = drawnTickets.get(i);
+            Ticket winningTicket = ticketsSold.get(i);
             prize.setWinningTicket(winningTicket);
         }
 
         raffle.setStatus(RaffleStatus.FINISHED);
+        raffle.setDrawDate(LocalDateTime.now());
+
         Raffle finishedRaffle = raffleRepository.save(raffle);
         return raffleMapper.toResponseDTO(finishedRaffle);
+    }
+
+    // ---------------
+
+    private Raffle getRaffleOrThrow(Long id) {
+        return raffleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Raffle with id " + id + " not found"));
+    }
+
+    private void validateNameUniqueness(String name, Long currentId) {
+        Optional<Raffle> conflict = raffleRepository.findByName(name);
+        if (conflict.isPresent()) {
+            // Se for create (currentId == null) OU se for update e o ID for diferente
+            if (currentId == null || !conflict.get().getId().equals(currentId)) {
+                throw new DuplicateResourceException("Name already taken");
+            }
+        }
+    }
+
+    private void validatePrizePlacements(List<PrizeCreate> prizes) {
+        List<Integer> placings = prizes.stream().map(PrizeCreate::placement).toList();
+        Set<Integer> uniquePlacings = new HashSet<>(placings);
+        if (uniquePlacings.size() < placings.size()) {
+            throw new BusinessException("Only one prize per placement (1st, 2nd, 3rd...) allowed");
+        }
+    }
+
+    private List<Ticket> generateTickets(long amount, Raffle raffle) {
+        return LongStream.rangeClosed(1, amount)
+                .mapToObj(number -> {
+                    Ticket ticket = new Ticket();
+                    ticket.setNumber(number);
+                    ticket.setStatus(TicketStatus.AVAILABLE);
+                    ticket.setRaffle(raffle);
+                    return ticket;
+                })
+                .toList();
+    }
+
+    private void validateDrawPrerequisites(Raffle raffle) {
+        if (raffle.getStatus() != RaffleStatus.OPEN) {
+            throw new BusinessException("Only Raffles with status 'OPEN' can be drawn");
+        }
+        if (raffle.getDrawDate() == null) {
+            throw new BusinessException("Draw date is invalid");
+        }
     }
 }

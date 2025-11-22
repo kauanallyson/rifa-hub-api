@@ -1,8 +1,8 @@
 package com.kauanallyson.rifa_hub_api.services;
 
-import com.kauanallyson.rifa_hub_api.dtos.client.ClientCreateDTO;
-import com.kauanallyson.rifa_hub_api.dtos.client.ClientResponseDTO;
-import com.kauanallyson.rifa_hub_api.dtos.client.ClientUpdateDTO;
+import com.kauanallyson.rifa_hub_api.dtos.client.ClientCreate;
+import com.kauanallyson.rifa_hub_api.dtos.client.ClientResponse;
+import com.kauanallyson.rifa_hub_api.dtos.client.ClientUpdate;
 import com.kauanallyson.rifa_hub_api.entities.Client;
 import com.kauanallyson.rifa_hub_api.exceptions.BusinessException;
 import com.kauanallyson.rifa_hub_api.exceptions.DuplicateResourceException;
@@ -24,7 +24,7 @@ public class ClientService {
 
     // Create
     @Transactional
-    public ClientResponseDTO createClient(ClientCreateDTO dto) {
+    public ClientResponse createClient(ClientCreate dto) {
         if (dto.email() != null && !dto.email().isEmpty() && clientRepository.existsByEmail(dto.email())) {
             throw new DuplicateResourceException("Email not available");
         }
@@ -38,35 +38,29 @@ public class ClientService {
         return clientMapper.toResponseDTO(savedClient);
     }
 
-    // Get all Active
+    // Find all
     @Transactional(readOnly = true)
-    public List<ClientResponseDTO> getAllActiveClients() {
-        List<Client> activeClients = clientRepository.findAllActive();
-        return activeClients.stream()
-                .map(clientMapper::toResponseDTO).
-                toList();
-    }
+    public List<ClientResponse> findAll(String name) {
+        String filterName = (name != null && !name.isBlank()) ? name : null;
 
-    // Find Active By id
-    @Transactional(readOnly = true)
-    public ClientResponseDTO findClientById(Long id) {
-        Client client = clientRepository.findActiveById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Client with id " + id + " not found"));
-        return clientMapper.toResponseDTO(client);
-    }
+        List<Client> clients = clientRepository.findAllActiveByName(filterName);
 
-    // Find Active By Name
-    @Transactional(readOnly = true)
-    public List<ClientResponseDTO> findClientByName(String nome) {
-        List<Client> clients = clientRepository.findAllActiveByName(nome);
         return clients.stream()
                 .map(clientMapper::toResponseDTO)
                 .toList();
     }
 
+    // Find Active By id
+    @Transactional(readOnly = true)
+    public ClientResponse findClientById(Long id) {
+        Client client = clientRepository.findActiveById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Client with id " + id + " not found"));
+        return clientMapper.toResponseDTO(client);
+    }
+
     // Update
     @Transactional
-    public ClientResponseDTO updateClient(Long id, ClientUpdateDTO dto) {
+    public ClientResponse updateClient(Long id, ClientUpdate dto) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Client with id " + id + " not found"));
 
@@ -74,15 +68,8 @@ public class ClientService {
             throw new BusinessException("Client inactive");
         }
 
-        Optional<Client> clientWithSameEmail = clientRepository.findByEmail(dto.email());
-        if (dto.email() != null && !dto.email().isEmpty() && clientWithSameEmail.isPresent() && !clientWithSameEmail.get().getId().equals(id)) {
-            throw new DuplicateResourceException("Email not available");
-        }
-
-        Optional<Client> clientWithSamePhone = clientRepository.findByPhone(dto.phone());
-        if (clientWithSamePhone.isPresent() && !clientWithSamePhone.get().getId().equals(id)) {
-            throw new DuplicateResourceException("Phone not available");
-        }
+        validateEmailUpdate(dto.email(), id);
+        validatePhoneUpdate(dto.phone(), id);
 
         clientMapper.updateEntityFromDTO(dto, client);
         clientRepository.save(client);
@@ -101,5 +88,24 @@ public class ClientService {
 
         client.setActive(false);
         clientRepository.save(client);
+    }
+
+    // ---------------
+    private void validateEmailUpdate(String email, Long currentId) {
+        if (email != null && !email.isBlank()) {
+            Optional<Client> conflict = clientRepository.findByEmail(email);
+            if (conflict.isPresent() && !conflict.get().getId().equals(currentId)) {
+                throw new DuplicateResourceException("Email not available");
+            }
+        }
+    }
+
+    private void validatePhoneUpdate(String phone, Long currentId) {
+        if (phone != null && !phone.isBlank()) {
+            Optional<Client> conflict = clientRepository.findByPhone(phone);
+            if (conflict.isPresent() && !conflict.get().getId().equals(currentId)) {
+                throw new DuplicateResourceException("Phone not available");
+            }
+        }
     }
 }

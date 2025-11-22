@@ -19,12 +19,16 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
 
     Optional<Seller> findByPhone(String phone);
 
-    @Query("SELECT s FROM Seller s WHERE s.id = :id AND s.active = true")
-    Optional<Seller> findActiveById(@Param("id") Long id);
-
     @Query("SELECT s FROM Seller s WHERE s.active = true")
     List<Seller> findAllActive();
 
-    @Query("SELECT s FROM Seller s WHERE lower(s.name) LIKE lower(concat('%', :name, '%')) AND s.active = true")
+    @Query("SELECT s FROM Seller s WHERE s.id = :id AND s.active = true")
+    Optional<Seller> findActiveById(@Param("id") Long id);
+
+    @Query("""
+            SELECT s FROM Seller s
+            WHERE lower(s.name) LIKE lower(concat('%', :name, '%'))
+            AND s.active = true
+            """)
     List<Seller> findAllActiveByName(@Param("name") String name);
 }

@@ -1,7 +1,7 @@
 package com.kauanallyson.rifa_hub_api.controllers;
 
-import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeCreateDTO;
-import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeResponseDTO;
+import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeCreate;
+import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeResponse;
 import com.kauanallyson.rifa_hub_api.services.PrizeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +18,10 @@ public class PrizeController {
 
     // POST /api/raffles/{id}/prizes
     @PostMapping
-    public ResponseEntity<PrizeResponseDTO> addPrize(
+    public ResponseEntity<PrizeResponse> addPrize(
             @PathVariable Long raffleId,
-            @Valid @RequestBody PrizeCreateDTO dto) {
-        PrizeResponseDTO response = prizeService.addPrize(raffleId, dto);
+            @Valid @RequestBody PrizeCreate dto) {
+        PrizeResponse response = prizeService.addPrize(raffleId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

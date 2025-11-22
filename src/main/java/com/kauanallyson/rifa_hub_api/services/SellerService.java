@@ -1,8 +1,8 @@
 package com.kauanallyson.rifa_hub_api.services;
 
-import com.kauanallyson.rifa_hub_api.dtos.seller.SellerCreateDTO;
-import com.kauanallyson.rifa_hub_api.dtos.seller.SellerResponseDTO;
-import com.kauanallyson.rifa_hub_api.dtos.seller.SellerUpdateDTO;
+import com.kauanallyson.rifa_hub_api.dtos.seller.SellerCreate;
+import com.kauanallyson.rifa_hub_api.dtos.seller.SellerResponse;
+import com.kauanallyson.rifa_hub_api.dtos.seller.SellerUpdate;
 import com.kauanallyson.rifa_hub_api.entities.Seller;
 import com.kauanallyson.rifa_hub_api.exceptions.BusinessException;
 import com.kauanallyson.rifa_hub_api.exceptions.DuplicateResourceException;
@@ -24,7 +24,7 @@ public class SellerService {
 
     // Create
     @Transactional
-    public SellerResponseDTO createSeller(SellerCreateDTO dto) {
+    public SellerResponse createSeller(SellerCreate dto) {
         if (sellerRepository.existsByEmail(dto.email())) {
             throw new DuplicateResourceException("Email not available");
         }
@@ -38,35 +38,29 @@ public class SellerService {
         return sellerMapper.toResponseDTO(savedSeller);
     }
 
-    // Get all Active
+    // Find All (Unified)
     @Transactional(readOnly = true)
-    public List<SellerResponseDTO> getAllSellers() {
-        List<Seller> activeSellers = sellerRepository.findAllActive();
-        return activeSellers.stream()
+    public List<SellerResponse> findAll(String name) {
+        String filterName = (name != null && !name.isBlank()) ? name : null;
+
+        List<Seller> sellers = sellerRepository.findAllActiveByName(filterName);
+
+        return sellers.stream()
                 .map(sellerMapper::toResponseDTO)
                 .toList();
     }
 
     // Find Active By id
     @Transactional(readOnly = true)
-    public SellerResponseDTO findSellerById(Long id) {
+    public SellerResponse findSellerById(Long id) {
         Seller seller = sellerRepository.findActiveById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Vendedor com id " + id + " não encontrado"));
         return sellerMapper.toResponseDTO(seller);
     }
 
-    // Find Active By Name
-    @Transactional(readOnly = true)
-    public List<SellerResponseDTO> findSellerByName(String nome) {
-        List<Seller> vendedores = sellerRepository.findAllActiveByName(nome);
-        return vendedores.stream()
-                .map(sellerMapper::toResponseDTO)
-                .toList();
-    }
-
     // Update
     @Transactional
-    public SellerResponseDTO updateSeller(Long id, SellerUpdateDTO dto) {
+    public SellerResponse updateSeller(Long id, SellerUpdate dto) {
         Seller seller = sellerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Seller with id " + id + " not found"));
 
@@ -74,15 +68,8 @@ public class SellerService {
             throw new BusinessException("Seller inactive");
         }
 
-        Optional<Seller> vendedorComMesmoEmail = sellerRepository.findByEmail(dto.email());
-        if (vendedorComMesmoEmail.isPresent() && !vendedorComMesmoEmail.get().getId().equals(id)) {
-            throw new DuplicateResourceException("Email not available");
-        }
-
-        Optional<Seller> vendedorComMesmoTelefone = sellerRepository.findByPhone(dto.phone());
-        if (vendedorComMesmoTelefone.isPresent() && !vendedorComMesmoTelefone.get().getId().equals(id)) {
-            throw new DuplicateResourceException("Phone not available");
-        }
+        validateEmailUpdate(dto.email(), id);
+        validatePhoneUpdate(dto.phone(), id);
 
         sellerMapper.updateEntityFromDTO(dto, seller);
         sellerRepository.save(seller);
@@ -101,5 +88,24 @@ public class SellerService {
 
         seller.setActive(false);
         sellerRepository.save(seller);
+    }
+
+    // ---------------
+    private void validateEmailUpdate(String email, Long currentId) {
+        if (email != null && !email.isBlank()) {
+            Optional<Seller> conflict = sellerRepository.findByEmail(email);
+            if (conflict.isPresent() && !conflict.get().getId().equals(currentId)) {
+                throw new DuplicateResourceException("Email not available");
+            }
+        }
+    }
+
+    private void validatePhoneUpdate(String phone, Long currentId) {
+        if (phone != null && !phone.isBlank()) {
+            Optional<Seller> conflict = sellerRepository.findByPhone(phone);
+            if (conflict.isPresent() && !conflict.get().getId().equals(currentId)) {
+                throw new DuplicateResourceException("Phone not available");
+            }
+        }
     }
 }

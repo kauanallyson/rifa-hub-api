@@ -1,7 +1,7 @@
 package com.kauanallyson.rifa_hub_api.services;
 
-import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeCreateDTO; // Usaremos um DTO de prêmio
-import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeResponseDTO;
+import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeCreate;
+import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeResponse;
 import com.kauanallyson.rifa_hub_api.entities.Prize;
 import com.kauanallyson.rifa_hub_api.entities.Raffle;
 import com.kauanallyson.rifa_hub_api.entities.enums.RaffleStatus;
@@ -23,7 +23,7 @@ public class PrizeService {
     private final PrizeMapper prizeMapper;
 
     @Transactional
-    public PrizeResponseDTO addPrize(Long raffleId, PrizeCreateDTO dto) {
+    public PrizeResponse addPrize(Long raffleId, PrizeCreate dto) {
         Raffle raffle = raffleRepository.findById(raffleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Raffle with id " + raffleId + " not found"));
 
