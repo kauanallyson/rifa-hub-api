@@ -4,6 +4,7 @@ import com.kauanallyson.rifa_hub_api.exceptions.BusinessException;
 import com.kauanallyson.rifa_hub_api.exceptions.DuplicateResourceException;
 import com.kauanallyson.rifa_hub_api.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -15,6 +16,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -82,6 +84,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        log.error("Unexpected error occurred on path: {}", request.getRequestURI(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 Instant.now(),
                 status.value(),
@@ -89,7 +92,6 @@ public class GlobalExceptionHandler {
                 "There was an unexpected error in the server. Please, contact the support",
                 request.getRequestURI()
         );
-        ex.printStackTrace();
         return ResponseEntity.status(status).body(errorResponse);
     }
 }
