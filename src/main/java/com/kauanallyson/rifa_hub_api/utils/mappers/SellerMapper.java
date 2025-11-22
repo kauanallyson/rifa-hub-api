@@ -1,9 +1,9 @@
 package com.kauanallyson.rifa_hub_api.utils.mappers;
 
-import com.kauanallyson.rifa_hub_api.dtos.ticket.TicketResponseDTO;
-import com.kauanallyson.rifa_hub_api.dtos.seller.SellerCreateDTO;
-import com.kauanallyson.rifa_hub_api.dtos.seller.SellerResponseDTO;
-import com.kauanallyson.rifa_hub_api.dtos.seller.SellerUpdateDTO;
+import com.kauanallyson.rifa_hub_api.dtos.seller.SellerCreate;
+import com.kauanallyson.rifa_hub_api.dtos.seller.SellerResponse;
+import com.kauanallyson.rifa_hub_api.dtos.seller.SellerUpdate;
+import com.kauanallyson.rifa_hub_api.dtos.ticket.TicketResponse;
 import com.kauanallyson.rifa_hub_api.entities.Seller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,7 +18,7 @@ public class SellerMapper {
 
     private final TicketMapper ticketMapper;
 
-    public Seller toEntity(SellerCreateDTO dto) {
+    public Seller toEntity(SellerCreate dto) {
         Seller seller = new Seller();
         seller.setName(dto.name());
         seller.setPhone(dto.phone());
@@ -26,14 +26,14 @@ public class SellerMapper {
         return seller;
     }
 
-    public SellerResponseDTO toResponseDTO(Seller seller) {
-        List<TicketResponseDTO> pontosDto = seller.getTicketsSold() != null ?
+    public SellerResponse toResponseDTO(Seller seller) {
+        List<TicketResponse> pontosDto = seller.getTicketsSold() != null ?
                 seller.getTicketsSold().stream()
                         .map(ticketMapper::toResponseDTO)
                         .collect(Collectors.toList()) :
                 Collections.emptyList();
 
-        return new SellerResponseDTO(
+        return new SellerResponse(
                 seller.getId(),
                 seller.getName(),
                 seller.getPhone(),
@@ -42,7 +42,7 @@ public class SellerMapper {
         );
     }
 
-    public void updateEntityFromDTO(SellerUpdateDTO dto, Seller seller) {
+    public void updateEntityFromDTO(SellerUpdate dto, Seller seller) {
         seller.setName(dto.name());
         seller.setPhone(dto.phone());
         seller.setEmail(dto.email());

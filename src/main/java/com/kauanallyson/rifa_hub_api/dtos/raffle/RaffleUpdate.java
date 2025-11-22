@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record RaffleUpdateDTO(
+public record RaffleUpdate(
         String name,
         String description,
         @Positive(message = "Ticket price must be positive")

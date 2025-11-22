@@ -1,8 +1,8 @@
 package com.kauanallyson.rifa_hub_api.utils.mappers;
 
-import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleCreateDTO;
-import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleResponseDTO;
-import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleUpdateDTO;
+import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleCreate;
+import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleResponse;
+import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleUpdate;
 import com.kauanallyson.rifa_hub_api.entities.Prize;
 import com.kauanallyson.rifa_hub_api.entities.Raffle;
 import com.kauanallyson.rifa_hub_api.entities.enums.RaffleStatus;
@@ -19,7 +19,7 @@ public class RaffleMapper {
 
     private final PrizeMapper prizeMapper;
 
-    public Raffle toEntity(RaffleCreateDTO dto) {
+    public Raffle toEntity(RaffleCreate dto) {
         Raffle raffle = new Raffle();
         raffle.setName(dto.name());
         raffle.setDescription(dto.description());
@@ -36,12 +36,12 @@ public class RaffleMapper {
         return raffle;
     }
 
-    public RaffleResponseDTO toResponseDTO(Raffle raffle) {
+    public RaffleResponse toResponseDTO(Raffle raffle) {
         long pontosVendidos = raffle.getTickets().stream()
                 .filter(p -> p.getStatus() == TicketStatus.SOLD)
                 .count();
 
-        return new RaffleResponseDTO(
+        return new RaffleResponse(
                 raffle.getId(),
                 raffle.getName(),
                 raffle.getDescription(),
@@ -55,7 +55,7 @@ public class RaffleMapper {
         );
     }
 
-    public void updateEntityFromDTO(RaffleUpdateDTO dto, Raffle raffle) {
+    public void updateEntityFromDTO(RaffleUpdate dto, Raffle raffle) {
         raffle.setName(dto.name());
         raffle.setDescription(dto.description());
         raffle.setTicketPrice(dto.ticketPrice());

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public record TicketOrderRequestDTO(
+public record TicketOrderRequest(
         @NotNull(message = "At least 1 ticket must be ordered")
         List<Integer> numbers,
 

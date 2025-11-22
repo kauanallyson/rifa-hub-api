@@ -1,7 +1,7 @@
 package com.kauanallyson.rifa_hub_api.utils.mappers;
 
-import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeCreateDTO;
-import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeResponseDTO;
+import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeCreate;
+import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeResponse;
 import com.kauanallyson.rifa_hub_api.entities.Prize;
 import com.kauanallyson.rifa_hub_api.entities.Raffle;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ public class PrizeMapper {
 
     private final TicketMapper ticketMapper;
 
-    public Prize toEntity(PrizeCreateDTO dto, Raffle raffle) {
+    public Prize toEntity(PrizeCreate dto, Raffle raffle) {
         Prize prize = new Prize();
         prize.setDescription(dto.description());
         prize.setPlacement(dto.placement());
@@ -21,8 +21,8 @@ public class PrizeMapper {
         return prize;
     }
 
-    public PrizeResponseDTO toResponseDTO(Prize prize) {
-        return new PrizeResponseDTO(
+    public PrizeResponse toResponseDTO(Prize prize) {
+        return new PrizeResponse(
                 prize.getDescription(),
                 prize.getPlacement(),
                 ticketMapper.toResponseDTO(prize.getWinningTicket())

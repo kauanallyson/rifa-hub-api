@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public record PrizeCreateDTO(
+public record PrizeCreate(
         @NotBlank(message = "Description is required")
         String description,
 

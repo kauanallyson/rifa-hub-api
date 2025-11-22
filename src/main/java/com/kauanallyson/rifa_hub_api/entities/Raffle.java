@@ -1,6 +1,6 @@
 package com.kauanallyson.rifa_hub_api.entities;
 
-import com.kauanallyson.rifa_hub_api.entities.enums.RaffleStatus;
+import com.kauanallyson.rifa_hub_api.enums.RaffleStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,7 +37,7 @@ public class Raffle {
     private LocalDateTime drawDate;
 
     @Column(nullable = false)
-    private Integer ticketAmount;
+    private Long ticketAmount;
 
     @OneToMany(mappedBy = "raffle", cascade = CascadeType.ALL)
     @ToString.Exclude

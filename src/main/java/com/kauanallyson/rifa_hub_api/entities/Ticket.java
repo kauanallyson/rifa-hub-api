@@ -1,6 +1,6 @@
 package com.kauanallyson.rifa_hub_api.entities;
 
-import com.kauanallyson.rifa_hub_api.entities.enums.TicketStatus;
+import com.kauanallyson.rifa_hub_api.enums.TicketStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,7 +23,7 @@ public class Ticket {
     private Long id;
 
     @Column(nullable = false)
-    private Integer number;
+    private Long number;
 
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
