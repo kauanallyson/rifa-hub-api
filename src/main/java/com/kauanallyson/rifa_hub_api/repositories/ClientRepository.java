@@ -19,15 +19,12 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     Optional<Client> findByPhone(String phone);
 
-    @Query("SELECT c FROM Client c WHERE c.active = true")
-    List<Client> findAllActive();
-
     @Query("SELECT c FROM Client c WHERE c.id = :id AND c.active = true")
     Optional<Client> findActiveById(@Param("id") Long id);
 
     @Query("""
             SELECT c FROM Client c
-            WHERE lower(c.name) LIKE lower(concat('%', :name, '%'))
+            WHERE (:name IS NULL OR (LOWER(c.name) LIKE :name))
             AND c.active = true
             """)
     List<Client> findAllActiveByName(@Param("name") String name);

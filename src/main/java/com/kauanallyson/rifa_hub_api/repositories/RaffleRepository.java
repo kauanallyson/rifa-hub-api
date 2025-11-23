@@ -13,14 +13,12 @@ import java.util.Optional;
 
 @Repository
 public interface RaffleRepository extends JpaRepository<Raffle, Long>, JpaSpecificationExecutor<Raffle> {
-    boolean existsByName(String name);
-
     Optional<Raffle> findByName(String name);
 
     @Query("""
             SELECT r FROM Raffle r
             WHERE (:status IS NULL OR r.status = :status)
-            AND (:name IS NULL OR lower(r.name) LIKE lower(concat('%', :name, '%')))
+            AND (:name IS NULL OR LOWER(r.name) LIKE :name)
             """)
     List<Raffle> findWithFilters(@Param("name") String name, @Param("status") RaffleStatus status);
 }
