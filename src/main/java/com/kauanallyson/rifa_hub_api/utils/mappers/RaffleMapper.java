@@ -5,8 +5,8 @@ import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleResponse;
 import com.kauanallyson.rifa_hub_api.dtos.raffle.RaffleUpdate;
 import com.kauanallyson.rifa_hub_api.entities.Prize;
 import com.kauanallyson.rifa_hub_api.entities.Raffle;
-import com.kauanallyson.rifa_hub_api.entities.enums.RaffleStatus;
-import com.kauanallyson.rifa_hub_api.entities.enums.TicketStatus;
+import com.kauanallyson.rifa_hub_api.enums.RaffleStatus;
+import com.kauanallyson.rifa_hub_api.enums.TicketStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

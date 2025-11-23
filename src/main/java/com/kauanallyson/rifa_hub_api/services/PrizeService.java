@@ -4,7 +4,7 @@ import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeCreate;
 import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeResponse;
 import com.kauanallyson.rifa_hub_api.entities.Prize;
 import com.kauanallyson.rifa_hub_api.entities.Raffle;
-import com.kauanallyson.rifa_hub_api.entities.enums.RaffleStatus;
+import com.kauanallyson.rifa_hub_api.enums.RaffleStatus;
 import com.kauanallyson.rifa_hub_api.exceptions.BusinessException;
 import com.kauanallyson.rifa_hub_api.exceptions.ResourceNotFoundException;
 import com.kauanallyson.rifa_hub_api.repositories.PrizeRepository;

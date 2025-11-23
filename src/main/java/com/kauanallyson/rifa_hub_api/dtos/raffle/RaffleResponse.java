@@ -1,7 +1,7 @@
 package com.kauanallyson.rifa_hub_api.dtos.raffle;
 
 import com.kauanallyson.rifa_hub_api.dtos.prize.PrizeResponse;
-import com.kauanallyson.rifa_hub_api.entities.enums.RaffleStatus;
+import com.kauanallyson.rifa_hub_api.enums.RaffleStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
