@@ -1,7 +1,7 @@
 # Rifa-Hub
 API RESTful desenvolvida para o sistema de gestão de rifas "Rifa-Hub". Esta API é responsável por toda a lógica de negócio, incluindo a criação de rifas, venda de tickets (bilhetes), gestão de vendedores e compradores, e a realização dos sorteios.
 
-## 🚀 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **Java 25**: Linguagem de programação principal
 - **Spring Boot 3.5.6**: Framework principal para a construção da aplicação
@@ -12,7 +12,7 @@ API RESTful desenvolvida para o sistema de gestão de rifas "Rifa-Hub". Esta API
 - **Maven**: Gerenciador de dependências e build do projeto
 - **Banco de Dados**: Projetado para ser compatível com qualquer banco SQL relacional (ex: PostgreSQL, MySQL, H2)
 
-## ⚙️ Como Executar o Projeto
+## Como Executar o Projeto
 
 ### 1. Clone o repositório
 
