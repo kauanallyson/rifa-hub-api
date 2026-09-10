@@ -16,7 +16,10 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "raffles")
+@Table(name = "raffles",
+        indexes = {
+                @Index(name = "idx_raffles_status", columnList = "status")
+        })
 @EqualsAndHashCode(of = "id")
 public class Raffle {
     @Id

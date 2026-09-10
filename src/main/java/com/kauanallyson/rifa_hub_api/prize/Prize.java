@@ -11,7 +11,10 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "prizes")
+@Table(name = "prizes",
+        indexes = {
+                @Index(name = "idx_prizes_raffle", columnList = "raffle_id")
+        })
 @EqualsAndHashCode(of = "id")
 public class Prize {
     @Id

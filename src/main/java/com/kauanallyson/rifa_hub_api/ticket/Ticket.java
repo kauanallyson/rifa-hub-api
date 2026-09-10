@@ -18,6 +18,11 @@ import java.time.LocalDateTime;
 @Table(name = "tickets",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"number", "raffle_id"})
+        },
+        indexes = {
+                @Index(name = "idx_tickets_raffle_status", columnList = "raffle_id, status"),
+                @Index(name = "idx_tickets_client", columnList = "client_id"),
+                @Index(name = "idx_tickets_seller", columnList = "seller_id")
         })
 @EqualsAndHashCode(of = "id")
 public class Ticket {
