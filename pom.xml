@@ -63,6 +63,21 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-testcontainers</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
         <dependency>
             <groupId>me.paulschwarz</groupId>
             <artifactId>spring-dotenv</artifactId>
@@ -107,6 +122,21 @@
 							<artifactId>lombok</artifactId>
 						</path>
 					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<!--
+							Docker Engine 29 refuses API versions below 1.40, while the docker-java
+							bundled with Testcontainers 1.21.3 negotiates lower and gets a 400 on /info.
+							Pinning the API version here keeps Testcontainers working without every
+							developer having to export DOCKER_API_VERSION. 1.41 is Docker 20.10+.
+						-->
+						<api.version>1.41</api.version>
+					</systemPropertyVariables>
 				</configuration>
 			</plugin>
 			<plugin>
