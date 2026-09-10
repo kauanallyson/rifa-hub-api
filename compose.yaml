@@ -1,0 +1,37 @@
+name: rifa-hub
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-rifahub}
+      POSTGRES_USER: ${DB_USERNAME:-rifahub}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-rifahub}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-rifahub} -d ${DB_NAME:-rifahub}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME:-rifahub}
+      DB_USERNAME: ${DB_USERNAME:-rifahub}
+      DB_PASSWORD: ${DB_PASSWORD:-rifahub}
+      TOKEN_SECRET: ${TOKEN_SECRET:-local-dev-secret-change-me}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
