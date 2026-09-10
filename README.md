@@ -3,14 +3,11 @@ API RESTful desenvolvida para o sistema de gestão de rifas "Rifa-Hub". Esta API
 
 ## Tecnologias Utilizadas
 
-- **Java 25**: Linguagem de programação principal
-- **Spring Boot 3.5.6**: Framework principal para a construção da aplicação
-- **Spring Data JPA / Hibernate**: Para persistência de dados e comunicação com o banco de dados
-- **Spring Web**: Para a criação dos endpoints RESTful
-- **Bean Validation**: Para validação dos dados de entrada (DTOs)
-- **Lombok**: Para reduzir código boilerplate em entidades e DTOs
-- **Maven**: Gerenciador de dependências e build do projeto
-- **Banco de Dados**: Projetado para ser compatível com qualquer banco SQL relacional (ex: PostgreSQL, MySQL, H2)
+- Java 21
+- Spring Boot 3.5.6
+- Lombok
+- Maven
+- PostgreSQL
 
 ## Como Executar o Projeto
 
@@ -21,28 +18,27 @@ API RESTful desenvolvida para o sistema de gestão de rifas "Rifa-Hub". Esta API
     cd rifa-hub-api
 ```
 
-### 2. Configure o Banco de Dados
+### 2. Configure as variáveis de ambiente
 
-Abra o arquivo `src/main/resources/application.properties` e configure as credenciais de acesso ao seu banco de dados.
-
-**Exemplo para PostgreSQL:**
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/rifa_hub_db
-spring.datasource.username=seu_usuario
-spring.datasource.password=sua_senha
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-spring.jpa.show-sql=true
-```
-
-### 3. Compile e Execute a Aplicação
-
-Use o Maven para compilar e iniciar o servidor Spring Boot:
+Copie o arquivo de exemplo e ajuste o que precisar. O `.env` está no `.gitignore`.
 
 ```bash
-    mvn spring-boot:run
+    cp .env.example .env
 ```
 
-A API estará disponível em `http://localhost:8080`.
+### 3. Suba a aplicação com Docker Compose
+
+```bash
+    docker compose up --build
+```
+
+### 4. Rodando a aplicação fora do Compose
+
+Se preferir rodar a aplicação pela IDE ou pelo Maven, deixe só o banco no Docker:
+
+```bash
+    docker compose up -d db
+    ./mvnw spring-boot:run
+```
+
+Nesse caso vale o `DB_URL` do `.env`, que aponta para `localhost:5432`.
