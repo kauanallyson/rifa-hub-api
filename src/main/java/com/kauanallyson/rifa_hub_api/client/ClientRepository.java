@@ -21,10 +21,13 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     @Query("SELECT c FROM Client c WHERE c.id = :id AND c.active = true")
     Optional<Client> findActiveById(@Param("id") Long id);
 
-    @Query("""
-            SELECT c FROM Client c
-            WHERE (:name IS NULL OR (LOWER(c.name) LIKE :name))
-            AND c.active = true
-            """)
-    List<Client> findAllActiveByName(@Param("name") String name);
+    @Query(value = "SELECT * FROM clients WHERE active = true", nativeQuery = true)
+    List<Client> findAllActive();
+
+    @Query(value = """
+            SELECT * FROM clients
+            WHERE active = true
+            AND to_tsvector('simple', name) @@ websearch_to_tsquery('simple', :name)
+            """, nativeQuery = true)
+    List<Client> searchActiveByName(@Param("name") String name);
 }

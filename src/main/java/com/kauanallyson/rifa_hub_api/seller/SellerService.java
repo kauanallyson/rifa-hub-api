@@ -6,6 +6,7 @@ import com.kauanallyson.rifa_hub_api.seller.dtos.SellerUpdate;
 import com.kauanallyson.rifa_hub_api.shared.exceptions.BusinessException;
 import com.kauanallyson.rifa_hub_api.shared.exceptions.DuplicateResourceException;
 import com.kauanallyson.rifa_hub_api.shared.exceptions.ResourceNotFoundException;
+import org.springframework.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,9 +39,9 @@ public class SellerService {
     // Find All (Unified)
     @Transactional(readOnly = true)
     public List<SellerResponse> findAll(String name) {
-        String filterName = (name != null && !name.isBlank()) ? name : null;
-
-        List<Seller> sellers = sellerRepository.findAllActiveByName(filterName);
+        List<Seller> sellers = StringUtils.hasText(name)
+                ? sellerRepository.searchActiveByName(name)
+                : sellerRepository.findAllActive();
 
         return sellers.stream()
                 .map(sellerMapper::toResponseDTO)

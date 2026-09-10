@@ -21,10 +21,13 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
     @Query("SELECT s FROM Seller s WHERE s.id = :id AND s.active = true")
     Optional<Seller> findActiveById(@Param("id") Long id);
 
-    @Query("""
-            SELECT s FROM Seller s
-            WHERE (:name IS NULL OR (LOWER(s.name) LIKE :name))
-            AND s.active = true
-            """)
-    List<Seller> findAllActiveByName(@Param("name") String name);
+    @Query(value = "SELECT * FROM sellers WHERE active = true", nativeQuery = true)
+    List<Seller> findAllActive();
+
+    @Query(value = """
+            SELECT * FROM sellers
+            WHERE active = true
+            AND to_tsvector('simple', name) @@ websearch_to_tsquery('simple', :name)
+            """, nativeQuery = true)
+    List<Seller> searchActiveByName(@Param("name") String name);
 }

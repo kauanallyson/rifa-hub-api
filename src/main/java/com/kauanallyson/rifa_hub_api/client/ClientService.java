@@ -6,6 +6,7 @@ import com.kauanallyson.rifa_hub_api.client.dtos.ClientUpdate;
 import com.kauanallyson.rifa_hub_api.shared.exceptions.BusinessException;
 import com.kauanallyson.rifa_hub_api.shared.exceptions.DuplicateResourceException;
 import com.kauanallyson.rifa_hub_api.shared.exceptions.ResourceNotFoundException;
+import org.springframework.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,9 +39,9 @@ public class ClientService {
     // Find all
     @Transactional(readOnly = true)
     public List<ClientResponse> findAll(String name) {
-        String filterName = (name != null && !name.isBlank()) ? name : null;
-
-        List<Client> clients = clientRepository.findAllActiveByName(filterName);
+        List<Client> clients = StringUtils.hasText(name)
+                ? clientRepository.searchActiveByName(name)
+                : clientRepository.findAllActive();
 
         return clients.stream()
                 .map(clientMapper::toResponseDTO)

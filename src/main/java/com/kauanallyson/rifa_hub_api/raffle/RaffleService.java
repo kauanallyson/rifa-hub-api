@@ -11,6 +11,7 @@ import com.kauanallyson.rifa_hub_api.shared.exceptions.BusinessException;
 import com.kauanallyson.rifa_hub_api.shared.exceptions.DuplicateResourceException;
 import com.kauanallyson.rifa_hub_api.shared.exceptions.ResourceNotFoundException;
 import com.kauanallyson.rifa_hub_api.ticket.Ticket;
+import org.springframework.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,9 +44,11 @@ public class RaffleService {
     // Find All
     @Transactional(readOnly = true)
     public List<RaffleResponse> findAll(String name, RaffleStatus status) {
-        String filterName = (name != null && !name.isBlank()) ? name : null;
+        String statusFilter = status == null ? null : status.name();
 
-        List<Raffle> raffles = raffleRepository.findWithFilters(filterName, status);
+        List<Raffle> raffles = StringUtils.hasText(name)
+                ? raffleRepository.searchByStatus(name, statusFilter)
+                : raffleRepository.findByStatus(statusFilter);
 
         return raffles.stream()
                 .map(raffleMapper::toResponseDTO)
